@@ -1,0 +1,23 @@
+version: "2"
+services:
+  db:
+    image: postgres:9.6
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: DXSxD81V
+      POSTGRES_DB: doubled
+      POSTGRES_USER: doubledadmin
+  web:
+    build:
+      context: ./
+      dockerfile: dev-dockerfile
+    command: python manage.py runserver 0.0.0.0:8000 --settings doubleddistributionapp.settings.dev
+    volumes:
+      - ./:/app
+    ports:
+      - "8000:8000"
+    links:
+      - db:db
+volumes:
+  db_data:

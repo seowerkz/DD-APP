@@ -1,0 +1,185 @@
+{% extends 'drivers/base.html' %}
+{% load static %}
+{% load bol_extras %}
+
+{% block page_title %} | BOL Entry{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static "global/plugins/clockface/css/clockface.css" %}">
+<link rel="stylesheet" type="text/css" href="{% static "global/plugins/bootstrap-datepicker/css/datepicker3.css" %}">
+<link rel="stylesheet" type="text/css" href="{% static "global/plugins/bootstrap-timepicker/css/bootstrap-timepicker.min.css" %}">
+<link rel="stylesheet" type="text/css" href="{% static "global/plugins/bootstrap-colorpicker/css/colorpicker.css" %}">
+<link rel="stylesheet" type="text/css" href="{% static "global/plugins/bootstrap-daterangepicker/daterangepicker-bs3.css" %}">
+<link rel="stylesheet" type="text/css" href="{% static "global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" %}">
+{% endblock %}
+
+{% block bol_entry_active %}active{% endblock %}
+
+{% block content %}
+<!-- BEGIN PAGE CONTENT-->
+<div class="row">
+    <div class="col-md-12">
+        <div class="tabbable tabbable-custom tabbable-noborder tabbable-reversed">
+            <div class="tab-pane">
+                <div class="portlet light bordered form-fit">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            BOL Form
+                        </div>
+                    </div>
+                    <div class="portlet-body form">
+                        <!-- BEGIN FORM-->
+                        <form id="bolForm" action="" method="post" class="form-horizontal form-bordered form-row-stripped">
+                            {% csrf_token %}
+                            <div class="form-body">
+                                {{ form.non_field_errors }}
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Truck</div>
+                                    <div class="col-md-9">
+                                        {{ form.truck.errors }}
+                                        {{ form.truck }}
+                                        {{ form.new_truck }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Trailer 1</div>
+                                    <div class="col-md-9">
+                                        {{ form.trailer_1.errors }}
+                                        {{ form.trailer_1 }}
+                                        {{ form.new_trailer_1 }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Trailer 2</div>
+                                    <div class="col-md-9">
+                                        {{ form.trailer_2.errors }}
+                                        {{ form.trailer_2 }}
+                                        {{ form.new_trailer_2 }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Shipper</div>
+                                    <div class="col-md-9">
+                                        {{ form.shipper.errors }}
+                                        {{ form.shipper }}
+                                        {{ form.new_shipper }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Customer</div>
+                                    <div class="col-md-9">
+                                        {{ form.customer.errors }}
+                                        {{ form.customer }}
+                                        {{ form.new_customer }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Product</div>
+                                    <div class="col-md-9">
+                                        {{ form.product.errors }}
+                                        {{ form.product }}
+                                        {{ form.new_product }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Weight</div>
+                                    <div class="col-md-9">
+                                        {{ form.weight.errors }}
+                                        <input name="weight" type="text" class="form-control" value="{{ form.weight.value|default_if_none:'' }}"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">BOL Number</div>
+                                    <div class="col-md-9">
+                                        {{ form.bol_number.errors }}
+                                        <input name="bol_number" type="text" class="form-control" value="{{ form.bol_number.value|default_if_none:'' }}"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Demurrage Reason</div>
+                                    <div class="col-md-9">
+                                        {{ form.demurrage_reason.errors }}
+                                        {{ form.demurrage_reason }}
+                                        {{ form.new_demurrage_reason }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Loading Arrival Time</div>
+                                    <div class="col-md-9">
+                                        {{ form.arrive_at.errors }}
+                                        <div class="input-group date form_datetime">
+                                            <input name="arrive_at" type="text" size="16" readonly="" class="form-control load-times" value="{{ form.arrive_at.value|convert_date|default_if_none:'' }}">
+                                            <span class="input-group-btn">
+                                            <button class="btn default date-set" type="button"><i class="fa fa-calendar"></i></button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Loading Departure Time</div>
+                                    <div class="col-md-9">
+                                        {{ form.depart_at.errors }}
+                                        <div class="input-group date form_datetime">
+                                            <input name="depart_at" type="text" size="16" readonly="" class="form-control load-times" value="{{ form.depart_at.value|convert_date|default_if_none:'' }}">
+                                            <span class="input-group-btn">
+                                            <button class="btn default date-set" type="button"><i class="fa fa-calendar"></i></button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group {% if not edit %}last{% endif %}">
+                                    <div class="control-label col-md-3">Comments</div>
+                                    <div class="col-md-9">
+                                        {{ form.comments.errors }}
+                                        <textarea name="comments" class="form-control">{{ form.comments.value|default_if_none:'' }}</textarea>
+                                    </div>
+                                </div>
+                                {% if edit %}
+                                    <div class="form-group last">
+                                        <div class="control-label col-md-3">Order Number</div>
+                                        <div class="col-md-9">
+                                            {{ form.order_number.errors }}
+                                            <input name="order_number" class="form-control" value="{{ form.order_number.value|default_if_none:'' }}">
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-actions">
+                                <div class="row">
+                                    <div class="col-md-offset-3 col-md-9">
+                                        <button type="submit" class="btn green"><i class="fa fa-check"></i>
+                                        {% if edit %}
+                                            Confirm
+                                        {% else %}
+                                            Send
+                                        {% endif %}
+                                        </button>
+                                        <button type="button" class="btn default" onclick="goBack()">Cancel</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- END FORM-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript" src="{% static "global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js" %}"></script>
+<script type="text/javascript" src="{% static "global/plugins/bootstrap-timepicker/js/bootstrap-timepicker.min.js" %}"></script>
+<script type="text/javascript" src="{% static "global/plugins/clockface/js/clockface.js" %}"></script>
+<script type="text/javascript" src="{% static "global/plugins/bootstrap-daterangepicker/moment.min.js" %}"></script>
+<script type="text/javascript" src="{% static "global/plugins/bootstrap-daterangepicker/daterangepicker.js" %}"></script>
+<script type="text/javascript" src="{% static "global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" %}"></script>
+<script type="text/javascript" src="{% static "admin/pages/scripts/components-pickers.js" %}"></script>
+<script>
+    jQuery(document).ready(function() {
+        ComponentsPickers.init();
+    });
+</script>
+<script type="text/javascript" src="{% static "drivers/js/bol-form.min.js" %}"></script>
+{% endblock %}

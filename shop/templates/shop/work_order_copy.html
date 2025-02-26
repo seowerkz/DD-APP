@@ -1,0 +1,116 @@
+<!-- BEGIN PAGE CONTENT-->
+<div class="row">
+    <!-- BEGIN WORK ORDER FORM -->
+    <div class="col-md-12">
+        <div class="tabbable tabbable-custom tabbable-noborder tabbable-reversed">
+            <div class="tab-pane">
+                <div class="portlet light bordered form-fit">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            Work Order Copy
+                        </div>
+                    </div>
+                    <div class="portlet-body form">
+                        <!-- BEGIN FORM-->
+                        <form id="workOrderForm" action="" method="post" class="form-horizontal form-bordered form-row-stripped">
+                            <div class="form-body">
+                                {{ form.non_field_errors }}
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Unit Number</div>
+                                    <div class="col-md-9">
+                                        {{ form.unit_number.value|default_if_none:'' }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Odometer</div>
+                                    <div class="col-md-9">
+                                        {{ form.odometer.value|default_if_none:'' }}
+                                    </div>
+                                </div>
+                                <fieldset id="mechanicFieldset">
+                                    <legend class="form-legend">Mechanics</legend>
+                                    <div class="form-group mechanic-form">
+                                        <div class="control-label col-md-3">Mechanic</div>
+                                        <div class="col-md-9">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Mechanic</th>
+                                                        <th>Hours</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for mechanic_form in mechanic_formset %}
+                                                        {% if mechanic_form.instance.mechanic %}
+                                                        <tr>
+                                                            <td>{{ mechanic_form.instance.mechanic.username }}</td>
+                                                            <td>{{ mechanic_form.instance.hours }}</td>
+                                                        </tr>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Full Service</div>
+                                    <div class="col-md-9">
+                                        <i class="fa fa-{% if form.full_service.value %}check-square-o{% else %}square-o{% endif %}"></i>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Greased</div>
+                                    <div class="col-md-9">
+                                        <i class="fa fa-{% if form.greased.value %}check-square-o{% else %}square-o{% endif %}"></i>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">UHP Inspection</div>
+                                    <div class="col-md-9">
+                                        <i class="fa fa-{% if form.inspected.value %}check-square-o{% else %}square-o{% endif %}"></i>
+                                    </div>
+                                </div>
+                                {% for work_performed_form in work_performed_formset %}
+                                    <div class="form-group work_performed-form">
+                                        <label class="control-label col-md-3">Work Performed <span class="number">{{ forloop.counter }}</span></label>
+                                        <div class="col-md-9">
+                                            {{ work_performed_form.work_performed.value }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                <fieldset id="partsFieldset">
+                                    <legend class="form-legend">Parts Used</legend>
+                                    <div class="form-group part-form">
+                                        <div class="control-label col-md-3">Part and Quantity Used</div>
+                                        <div class="col-md-9">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Part</th>
+                                                        <th>Quantity</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for part_form in part_formset %}
+                                                        {% if part_form.part.value %}
+                                                            <tr>
+                                                                <td>{{ part_form.instance.part }}</td>
+                                                                <td>{{ part_form.instance.quantity }}</td>
+                                                            </tr>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </form>
+                        <!-- END FORM-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,121 @@
+{% extends 'drivers/base.html' %}
+{% load static %}
+
+{% block page_title %} | Trailer Loading Levels{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block trailer_loading_levels_active %}active{% endblock %}
+
+{% block content %}
+<div class="col-md-12">
+    <div class="tabbable-custom tabbable-noborder">
+        <ul class="nav nav-tabs">
+            <li class="active">
+                <a href="#asphaltTrailers" data-toggle="tab" aria-expanded="true">Asphalt Trailers</a>
+            </li>
+            <li class="">
+                <a href="#crudeTrailers" data-toggle="tab" aria-expanded="false">Crude Trailers</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="asphaltTrailers">
+                <div class="portlet box red">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            Asphalt Trailers
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <p>All outages are measured from the top of the dome lid to the top of the oil.</p>
+                        {% for measurement in asphalt_measurements %}
+                            <table class="table table-striped table-bordered table-hover dataTable no-footer" role="grid">
+                                <thead>
+                                    <tr>
+                                        <th colspan="2">
+                                            Measurements for {{ measurement }}
+                                        </th>
+                                    </tr>
+                                    <tr role="row">
+                                        <th>
+                                             Trailer
+                                        </th>
+                                        <th>
+                                             Outage
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for outage in measurement.asphalttraileroutage_set.all|dictsort:"trailer.name" %}
+                                        <tr class="gradeX {% cycle 'odd' 'even' %}" role="row">
+                                            <td>
+                                                {{ outage.trailer }}
+                                            </td>
+                                            <td>
+                                                {{ outage.outage }}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="crudeTrailers">
+                <div class="portlet box red">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            Crude Trailers
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <p>All measurements listed in inches are measured from the bottom of the dome lid to the top of the oil.</p>
+                        <table class="table table-striped table-bordered table-hover dataTable no-footer" role="grid">
+                            <thead>
+                                <tr role="row">
+                                    <th>
+                                         Trailer
+                                    </th>
+                                    <th>
+                                         Gravity
+                                    </th>
+                                    <th>
+                                         Gauge Measurement
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for trailer in trailers %}
+                                    {% if trailer.crudetrailerlevel_set.all %}
+                                        <tr>
+                                            <td colspan="3">
+                                                {{ trailer }}
+                                            </td>
+                                        </tr>
+                                        {% for level in trailer.crudetrailerlevel_set.all|dictsort:"gravity" %}
+                                            <tr class="gradeX {% cycle 'odd' 'even' %}" role="row">
+                                                <td></td>
+                                                <td>
+                                                    {{ level.gravity }}
+                                                </td>
+                                                <td>
+                                                    {{ level.gauge_measurement }}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}

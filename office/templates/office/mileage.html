@@ -1,0 +1,89 @@
+{% extends 'office/base.html' %}
+{% load static %}
+
+{% block page_title %} | Mileage Reports{% endblock %}
+
+{% block mileage_active %}active{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static "global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css" %}">
+{% endblock %}
+
+{% block content %}
+<div class="col-md-12">
+    <div class="tabbable-custom tabbable-noborder">
+        <ul class="nav nav-tabs">
+            <li class="active">
+                <a href="#newMileage" data-toggle="tab" aria-expanded="true">New Mileage Reports</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="newMileage">
+                <div class="portlet box red">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <i class="fa fa-check"></i>New Mileage Reports
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <table class="table table-striped table-bordered table-hover dataTable no-footer" id="newMileageTable" role="grid">
+                            <thead>
+                                <tr role="row">
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                         Date Created
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                         Username
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                         Truck
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                         Mileage
+                                    </th>
+                                    <th class="sorting_disabled" rowspan="1" colspan="1">
+                                         Dismiss
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for report in mileage_reports %}
+                                    <tr class="gradeX {% cycle 'odd' 'even' %}" role="row">
+                                        <td>
+                                            {{ report.created_at }}
+                                        </td>
+                                        <td>
+                                            {{ report.created_by.username }}
+                                        </td>
+                                        <td>
+                                            {{ report.truck|default_if_none:'' }}
+                                        </td>
+                                        <td>
+                                            {{ report.mileage|default_if_none:'' }}
+                                        </td>
+                                        <td>
+                                            <a href="#" class="dismiss" data-id="{{ report.id }}"><i class="fa fa-check"></i></a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript" src="{% static "global/plugins/select2/select2.min.js" %}"></script>
+<script type="text/javascript" src="{% static "global/plugins/datatables/media/js/jquery.dataTables.min.js" %}"></script>
+<script type="text/javascript" src="{% static "global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js" %}"></script>
+<script type="text/javascript" src="{% static "office/js/mileage.min.js" %}"></script>
+<script>
+jQuery(document).ready(function() {
+   TableManaged.init();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'drivers/base.html' %}
+{% load static %}
+
+{% block page_title %} | Fuel Pricing{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block fuel_pricing_active %}active{% endblock %}
+
+{% block content %}
+<!-- BEGIN PAGE CONTENT-->
+<div class="row">
+    <div class="portlet box red">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="fa fa-money"></i>Fuel Pricing
+            </div>
+        </div>
+        <div class="portlet-body">
+            <iframe src="https://www.google.com/maps/d/embed?mid=1DQAIXtA_vrP9U4Pzo3clUqBz0R4&key=AIzaSyD4aDCnixwXNbT30WQMcvFr8sjYjppZ6zs" width="640" height="480" style="width: 100%;"></iframe>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}

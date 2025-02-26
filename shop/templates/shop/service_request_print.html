@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Service Record - {{ service_request.equipment }}</title>
+        <style type="text/css">
+            @page {
+                size: {{ pagesize }};
+                margin: 1in;
+                @frame footer {
+                    -pdf-frame-content: footerContent;
+                    bottom: 1cm;
+                    margin-left: 4in;
+                    margin-right: 4in;
+                    height: 1cm;
+                }
+            }
+            .table {
+                border: 1px solid black;
+                font-size: 12px;
+            }
+            .table td, th {
+                padding: 3px;
+                vertical-align: middle;
+                width: 50%;
+            }
+            h1 {
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Service Record - {{ service_request.equipment }}</h1>
+        <table class="table">
+            <thead></thead>
+            <tbody>
+                <tr>
+                    <td>Equipment</td>
+                    <td>{{ form.equipment.value|default_if_none:'' }}</td>
+                </tr>
+                {% for problem_form in problem_formset %}
+                    {% if problem_form.problem.value %}
+                        <tr>
+                            <td>Problem {{ forloop.counter }}</td>
+                            <td>{{ problem_form.instance.problem }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                {% for image_form in image_formset %}
+                    {% if image_form.instance.image %}
+                        <tr>
+                            <td>Picture</td>
+                            <td><img src="{{ image_form.instance.image.url }}"></td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div id="footerContent">
+            {% block page_foot %}
+                Page <pdf:pagenumber>
+            {% endblock %}
+        </div>
+    </body>
+</html>

@@ -1,0 +1,50 @@
+{% extends 'drivers/base.html' %}
+{% load static %}
+
+{% block page_title %} | Accident Report{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block accident_report_active %}active{% endblock %}
+
+{% block content %}
+<!-- BEGIN PAGE CONTENT-->
+<div class="row">
+    <div class="portlet box red">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="fa fa-ambulance"></i>Accident Report
+            </div>
+        </div>
+        <div class="portlet-body">
+            <h3>Call Double D</h3>
+            <ul class="list-unstyled">
+                <li>Notify dispatch or someone in the Double D office IMMEDIATELY.</li>
+            </ul>
+
+            <h3>Secure the Scene</h3>
+            <ul class="list-unstyled">
+                <li>Stop; turn on your emergency flashers and shut down your vehicle; do NOT move your truck until the police arrive.</li>
+                <li>Set out warning devices; protect the scene. Assist the injured but do not move anyone; wait for medical assistance.</li>
+            </ul>
+
+            <h3>Notify the Authorities</h3>
+            <ul class="list-unstyled">
+                <li>Call the police; request medical assistance if needed.</li>
+                <li>Call Great West: <a href="tel:8002288040">(800) 228-8040</a></li>
+                <li>Stay at the scene. Be polite, courteous, and professional. <u>Do NOT admit guilt or apologize.</u></li>
+            </ul>
+
+            <h3>Document the Accident</h3>
+            <ul class="list-unstyled">
+                <li>Find and begin filling out the Great West Accident Report in your truck.</li>
+                <li>Follow the Great West form for further instructions, call dispatch for questions.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}

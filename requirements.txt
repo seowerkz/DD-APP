@@ -1,0 +1,12 @@
+Django==3.2.21              # LTS version, stable and secure
+html5lib==1.1               # No change, latest stable
+Pillow==9.5.0               # Updated for security and performance
+psycopg2-binary==2.9.9      # Precompiled, easier to install
+djrill==2.1.0               # No newer versions, kept as is
+PyPDF2==3.0.1               # Major updates and bug fixes
+pytz==2023.3                # Updated timezone data
+reportlab==3.6.12           # Improved PDF generation
+six==1.16.0                 # Latest stable version
+xhtml2pdf==0.2.7            # Bug fixes and improvements
+django-storages==1.13.2     # Updated for better S3 support
+boto3==1.28.0               # AWS SDK updates for better cloud integration

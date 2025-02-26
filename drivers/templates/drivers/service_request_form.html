@@ -1,0 +1,102 @@
+{% extends 'drivers/base.html' %}
+{% load static %}
+
+{% block page_title %} | Service Request Entry{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static "global/plugins/bootstrap-fileinput/bootstrap-fileinput.css" %}">
+{% endblock %}
+
+{% block service_request_entry_active %}active{% endblock %}
+
+{% block content %}
+<!-- BEGIN PAGE CONTENT-->
+<div class="row">
+    <div class="col-md-12">
+        <div class="tabbable tabbable-custom tabbable-noborder tabbable-reversed">
+            <div class="tab-pane">
+                <div class="portlet light bordered form-fit">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            Service Record Form
+                        </div>
+                    </div>
+                    <div class="portlet-body form">
+                        <!-- BEGIN FORM-->
+                        <form id="bolForm" action="" method="post" enctype="multipart/form-data" class="form-horizontal form-bordered form-row-stripped">
+                            {% csrf_token %}
+                            <div class="form-body">
+                                {{ form.non_field_errors }}
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">Equipment</label>
+                                    <div class="col-md-9">
+                                        {{ form.equipment.errors }}
+                                        <textarea name="equipment" class="form-control regular-textarea">{{ form.equipment.value|default_if_none:'' }}</textarea>
+                                    </div>
+                                </div>
+                                {{ problem_formset.management_form }}
+                                {{ problem_formset.non_form_errors }}
+                                {% for problem_form in problem_formset %}
+                                    <div class="form-group problem-form">
+                                        <label class="control-label col-md-3">Problem <span class="number">{{ forloop.counter }}</span></label>
+                                        <div class="col-md-9">
+                                            {{ problem_form.problem.errors }}
+                                            {{ problem_form.problem }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                <div class="form-group">
+                                    <div class="control-label col-md-3"></div>
+                                    <div class="col-md-9">
+                                        <button type="button" id="add_more_problems" class="btn btn-xs blue"><i class="fa fa-plus"></i> Add More Problems</button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">Picture</label>
+                                    <div id="images" class="col-md-9">
+                                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                                            <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px; line-height: 150px;">
+                                            </div>
+                                            <div>
+                                                <span class="btn default btn-file">
+                                                <span class="fileinput-new">
+                                                Select image </span>
+                                                <span class="fileinput-exists">
+                                                Change </span>
+                                                <input type="hidden"><input type="file" name="image[]">
+                                                </span>
+                                                <a href="#" class="btn red fileinput-exists" data-dismiss="fileinput">
+                                                Remove </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group last">
+                                    <div class="control-label col-md-3"></div>
+                                    <div class="col-md-9">
+                                        <button type="button" id="add_more_images" class="btn btn-xs blue"><i class="fa fa-plus"></i> Add More Images</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <div class="row">
+                                    <div class="col-md-offset-3 col-md-9">
+                                        <button type="submit" class="btn green"><i class="fa fa-check"></i> Send</button>
+                                        <a href="{% url "home" %}" class="btn default">Cancel</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- END FORM-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript" src="{% static "global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" %}"></script>
+<script type="text/javascript" src="{% static "drivers/js/service-request.min.js" %}"></script>
+{% endblock %}

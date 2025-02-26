@@ -1,0 +1,65 @@
+{% extends 'drivers/base.html' %}
+{% load static %}
+
+{% block page_title %} | Mileage Report Entry{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block mileage_report_entry_active %}active{% endblock %}
+
+{% block content %}
+<!-- BEGIN PAGE CONTENT-->
+<div class="row">
+    <div class="col-md-12">
+        <div class="tabbable tabbable-custom tabbable-noborder tabbable-reversed">
+            <div class="tab-pane">
+                <div class="portlet light bordered form-fit">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            Mileage Report Form
+                        </div>
+                    </div>
+                    <div class="portlet-body form">
+                        <!-- BEGIN FORM-->
+                        <form id="bolForm" action="" method="post" class="form-horizontal form-bordered form-row-stripped">
+                            {% csrf_token %}
+                            <div class="form-body">
+                                {{ form.non_field_errors }}
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">Truck Number</label>
+                                    <div class="col-md-9">
+                                        {{ form.truck.errors }}
+                                        {{ form.truck }}
+                                        {{ form.new_truck }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">Mileage</label>
+                                    <div class="col-md-9">
+                                        {{ form.mileage.errors }}
+                                        <input type="number" name="mileage" class="form-control" value="{{ form.mileage.value|default_if_none:'' }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <div class="row">
+                                    <div class="col-md-offset-3 col-md-9">
+                                        <button type="submit" class="btn green"><i class="fa fa-check"></i> Send</button>
+                                        <a href="{% url "home" %}" class="btn default">Cancel</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- END FORM-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript" src="{% static "drivers/js/mileage-report.min.js" %}"></script>
+{% endblock %}

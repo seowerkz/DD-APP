@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Work Order - {{ work_order.unit_number }}</title>
+        <style type="text/css">
+            @page {
+                size: {{ pagesize }};
+                margin: 1in;
+                @frame footer {
+                    -pdf-frame-content: footerContent;
+                    bottom: 1cm;
+                    margin-left: 4in;
+                    margin-right: 4in;
+                    height: 1cm;
+                }
+            }
+            .table {
+                border: 1px solid black;
+                font-size: 12px;
+            }
+            .table td, th {
+                padding: 3px;
+                vertical-align: middle;
+                width: 50%;
+            }
+            h1 {
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        {% for f in forms %}
+            <div style="page-break-after: always;">
+                <h1>Work Order - {{ f.work_order.unit_number }}</h1>
+                <table class="table">
+                    <thead></thead>
+                    <tbody>
+                        <tr>
+                            <td>Unit Number</td>
+                            <td>{{ f.form.unit_number.value|default_if_none:'' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Axon Number</td>
+                            <td>{{ f.form.axon_number.value|default_if_none:'' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Date Completed</td>
+                            <td>{{ f.work_order.completed_at }} </td>
+                        </tr>
+                        <tr>
+                            <td>Odometer</td>
+                            <td>{{ f.form.odometer.value|default_if_none:'' }}</td>
+                        </tr>
+                        {% for mechanic_form in f.mechanic_formset %}
+                            {% if mechanic_form.mechanic.value %}
+                                <tr>
+                                    <td>Mechanic - Hours</td>
+                                    <td>{{ mechanic_form.instance.mechanic.username }} - {{ mechanic_form.instance.hours }}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                        <tr>
+                            <td>Full Service</td>
+                            <td>{% if f.form.full_service.value %}&#10004;{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td>Greased</td>
+                            <td>{% if f.form.greased.value %}&#10004;{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td>UHP Inspection</td>
+                            <td>{% if f.form.inspected.value %}&#10004;{% endif %}</td>
+                        </tr>
+                        {% if f.work_order.workperformed_set.all and f.work_performed_formset %}
+                            {% for work_performed_form in f.work_performed_formset %}
+                                {% if work_performed_form.instance.work_performed %}
+                                    <tr>
+                                        <td>Work Performed {{ forloop.counter }}</td>
+                                        <td>{{ work_performed_form.instance.work_performed }}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+                {% if f.work_order.parts.all and f.part_formset %}
+                <h2>Parts Used</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Part</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for part_form in f.part_formset %}
+                            {% if part_form.part.value %}
+                                <tr>
+                                    <td>{{ part_form.instance.part }}</td>
+                                    <td>{{ part_form.instance.quantity }}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <div id="footerContent">
+            {% block page_foot %}
+                Page <pdf:pagenumber>
+            {% endblock %}
+        </div>
+    </body>
+</html>

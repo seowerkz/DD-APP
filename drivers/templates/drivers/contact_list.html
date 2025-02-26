@@ -1,0 +1,51 @@
+{% extends 'drivers/base.html' %}
+{% load static %}
+
+{% block page_title %} | Contact List{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block contact_list_active %}active{% endblock %}
+
+{% block content %}
+<!-- BEGIN PAGE CONTENT-->
+<div class="row">
+    <div class="portlet box red">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="fa fa-phone"></i>Contact List
+            </div>
+        </div>
+        <div class="portlet-body">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Contact</th>
+                        <th>Number</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Double D Office</strong></td>
+                        <td><a href="tel:801-292-7999"><strong>801-292-7999</strong></a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Double D Dispatch</strong></td>
+                        <td><a href="tel:801-294-6565"><strong>801-294-6565</strong></a></td>
+                    </tr>
+                    {% for user in users %}
+                        <tr>
+                            <td>{% if user.user.get_full_name %}{{ user.user.get_full_name }}{% else %}{{ user.user.username }}{% endif %}</td>
+                            <td><a href="tel:{{ user.phone }}">{{ user.phone }}</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}

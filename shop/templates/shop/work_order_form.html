@@ -1,0 +1,344 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+{% load work_order_extras %}
+
+{% block page_title %} | Work Order Entry{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block services_active %}active{% endblock %}
+
+{% block content %}
+<!-- BEGIN PAGE CONTENT-->
+<div class="row">
+    <!-- BEGIN SERVICE REQUEST -->
+    {% if service_request %}
+        <div class="col-md-6">
+            <div class="tabbable tabbable-custom tabbable-noborder tabbable-reversed">
+                <div class="tab-pane">
+                    <div class="portlet light bordered form-fit">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                Service Record
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <!-- BEGIN FORM-->
+                            {% if user.is_superuser %}
+                                <form action="" method="post" enctype="multipart/form-data" class="form-horizontal form-bordered form-row-stripped">
+                                    {% csrf_token %}
+                                    <input type="hidden" value="{{ service_request.id }}" name="service_request" />
+                                    <div class="form-body">
+                                        {{ service_form.non_field_errors }}
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3">Equipment</label>
+                                            <div class="col-md-9">
+                                                {{ service_form.equipment.errors }}
+                                                <textarea name="equipment" class="form-control regular-textarea">{{ service_form.equipment.value|default_if_none:'' }}</textarea>
+                                            </div>
+                                        </div>
+                                        {{ problem_formset.management_form }}
+                                        {{ problem_formset.non_form_errors }}
+                                        {% for problem_form in problem_formset %}
+                                            {% for hidden in problem_form.hidden_fields %}
+                                                {{ hidden }}
+                                            {% endfor %}
+                                            <div class="form-group problem-form">
+                                                <label class="control-label col-md-3">Problem <span class="number">{{ forloop.counter }}</span></label>
+                                                <div class="col-md-9">
+                                                    {{ problem_form.problem.errors }}
+                                                    {{ problem_form.problem }}
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                        <div class="form-group">
+                                            <div class="control-label col-md-3"></div>
+                                            <div class="col-md-9">
+                                                <button type="button" id="add_more_problems" class="btn btn-xs blue"><i class="fa fa-plus"></i> Add More Problems</button>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3">Picture</label>
+                                            <div id="images" class="col-md-9">
+                                                <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                    <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px; line-height: 150px;">
+                                                    </div>
+                                                    <div>
+                                                        <span class="btn default btn-file">
+                                                        <span class="fileinput-new">
+                                                        Select image </span>
+                                                        <span class="fileinput-exists">
+                                                        Change </span>
+                                                        <input type="hidden"><input type="file" name="image[]">
+                                                        </span>
+                                                        <a href="#" class="btn red fileinput-exists" data-dismiss="fileinput">
+                                                        Remove </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="control-label col-md-3"></div>
+                                            <div class="col-md-9">
+                                                <button type="button" id="add_more_images" class="btn btn-xs blue"><i class="fa fa-plus"></i> Add More Images</button>
+                                            </div>
+                                        </div>
+                                        <div class="form-group last">
+                                            {% for service_image in service_request.servicerequestimage_set.all %}
+                                                {% if service_image.image %}
+                                                    <div class="control-label col-md-3">Picture</div>
+                                                    <div class="col-md-9">
+                                                        <a href="{{ service_image.image.url }}" target="_blank"><img src="{{ service_image.image.url }}" class="img-responsive"></a>
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="form-actions">
+                                        <div class="row">
+                                            <div class="col-md-offset-3 col-md-9">
+                                                <input type="hidden" name="serviceForm" value="service" />
+                                                <button type="submit" class="btn green"><i class="fa fa-check"></i> Update</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            {% else %}
+                                <form class="form-horizontal form-bordered form-row-stripped">
+                                    <div class="form-body">
+                                        <div class="form-group">
+                                            <div class="control-label col-md-3">Submitted By</div>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" value="{{ service_request.created_by }}" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="control-label col-md-3">Equipment</div>
+                                            <div class="col-md-9">
+                                                <textarea class="form-control" disabled>{{ service_request.equipment }}</textarea>
+                                            </div>
+                                        </div>
+                                        {% for problem in problems %}
+                                            <div class="form-group problem-form">
+                                                <label class="control-label col-md-3">Problem <span class="number">{{ forloop.counter }}</span></label>
+                                                <div class="col-md-9">
+                                                    <textarea class="form-control" disabled>{{ problem.problem|default_if_none:"" }}</textarea>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                        <div class="form-group last">
+                                            {% for service_image in service_request.servicerequestimage_set.all %}
+                                                {% if service_image.image %}
+                                                    <div class="control-label col-md-3">Picture</div>
+                                                    <div class="col-md-9">
+                                                        <a href="{{ service_image.image.url }}" target="_blank"><img src="{{ service_image.image.url }}" class="img-responsive"></a>
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </form>
+                            {% endif %}
+                            <!-- END FORM-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <!-- END SERVICE REQUEST -->
+    <!-- BEGIN WORK ORDER FORM -->
+    <div class="{% if service_request %}col-md-6{% else %}col-md-12{% endif %}">
+        <div class="tabbable tabbable-custom tabbable-noborder tabbable-reversed">
+            <div class="tab-pane">
+                <div class="portlet light bordered form-fit">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            Work Order Form
+                        </div>
+                    </div>
+                    <div class="portlet-body form">
+                        <!-- BEGIN FORM-->
+                        <form id="workOrderForm" action="" method="post" class="form-horizontal form-bordered form-row-stripped">
+                            {% csrf_token %}
+                            <div class="form-body">
+                                {{ form.non_field_errors }}
+                                {% if work_order and work_order.completed_at %}
+                                    <div class="form-group">
+                                        <div class="control-label col-md-3">Work Order Reviewed</div>
+                                        <div class="col-md-9">
+                                            {{ form.work_order_reviewed.errors }}
+                                            <input id="workOrderReviewed" type="checkbox" name="work_order_reviewed" class="form-control" maxlength="255" {% if form.work_order_reviewed.value %}checked{% endif %} required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="control-label col-md-3">Axon Work Order Number</div>
+                                        <div class="col-md-9">
+                                            {{ form.axon_number.errors }}
+                                            <input id="axonNumber" type="text" name="axon_number" class="form-control" maxlength="255" value="{{ form.axon_number.value|default_if_none:'' }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="control-label col-md-3">Date Started</div>
+                                        <div class="col-md-9">
+                                            <input type="text" class="form-control" value="{{ work_order.created_at }}" disabled="disabled">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="control-label col-md-3">Date Completed</div>
+                                        <div class="col-md-9">
+                                            <input type="text" class="form-control" value="{{ work_order.completed_at }}" disabled="disabled">
+                                        </div>
+                                    </div>
+                                    {% if work_order.finished_at %}
+                                        <div class="form-group">
+                                            <div class="control-label col-md-3">Date Finished</div>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" value="{{ work_order.finished_at }}" disabled="disabled">
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Unit Number</div>
+                                    <div class="col-md-9">
+                                        {{ form.unit_number.errors }}
+                                        <input type="text" name="unit_number" class="form-control" maxlength="255" value="{{ form.unit_number.value|default_if_none:'' }}">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Odometer</div>
+                                    <div class="col-md-9">
+                                        {{ form.odometer.errors }}
+                                        <input id="odometer" type="text" name="odometer" class="form-control" maxlength="255" value="{{ form.odometer.value|default_if_none:'' }}">
+                                    </div>
+                                </div>
+
+                                <fieldset id="mechanicFieldset">
+                                    <legend class="form-legend">Mechanics</legend>
+                                    {{ mechanic_formset.management_form }}
+                                    {{ mechanic_formset.non_form_errors }}
+
+                                    {% for mechanic_form in mechanic_formset %}
+                                        <div class="form-group mechanic-form">
+                                            {{ mechanic_form.id }}
+                                            {{ mechanic_form.non_field_errors }}
+                                            <div class="control-label col-md-3">Mechanic</div>
+                                            <div class="col-md-9">
+                                                {{ mechanic_form.mechanic.errors }}
+                                                {{ mechanic_form.mechanic }}
+                                            </div>
+                                            <div class="control-label col-md-3">Hours</div>
+                                            <div class="col-md-9">
+                                                {{ mechanic_form.hours.errors }}
+                                                {{ mechanic_form.hours }}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </fieldset>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3"></div>
+                                    <div class="col-md-9">
+                                        <button type="button" id="add_more_mechanics" class="btn btn-xs blue"><i class="fa fa-plus"></i> Add More Mechanics</button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Full Service</div>
+                                    <div class="col-md-9">
+                                        {{ form.full_service.errors }}
+                                        {{ form.full_service }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">Greased</div>
+                                    <div class="col-md-9">
+                                        {{ form.greased.errors }}
+                                        {{ form.greased }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3">UHP Inspection</div>
+                                    <div class="col-md-9">
+                                        {{ form.inspected.errors }}
+                                        {{ form.inspected }}
+                                    </div>
+                                </div>
+                                {{ work_performed_formset.management_form }}
+                                {{ work_performed_formset.non_form_errors }}
+                                {% for work_performed in work_performed_formset %}
+                                    {% for hidden in work_performed.hidden_fields %}
+                                        {{ hidden }}
+                                    {% endfor %}
+                                    <div class="form-group work_performed-form">
+                                        <label class="control-label col-md-3">Work Performed <span class="number">{{ forloop.counter }}</span></label>
+                                        <div class="col-md-9">
+                                            {{ work_performed.work_performed.errors }}
+                                            {{ work_performed.work_performed }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                <div class="form-group">
+                                    <div class="control-label col-md-3"></div>
+                                    <div class="col-md-9">
+                                        <button type="button" id="add_more_work_performed" class="btn btn-xs blue"><i class="fa fa-plus"></i> Add More Work Performed</button>
+                                    </div>
+                                </div>
+                                <fieldset id="partsFieldset">
+                                    <legend class="form-legend">Parts Used</legend>
+                                    {{ part_formset.management_form }}
+                                    {{ part_formset.non_form_errors }}
+
+                                    {% for part_form in part_formset %}
+                                        <div class="form-group part-form">
+                                            {{ part_form.id }}
+                                            {{ part_form.non_field_errors }}
+                                            <div class="control-label col-md-3">Part and Quantity Used</div>
+                                            <div class="col-md-9">
+                                                {{ part_form.part.errors }}
+                                                {{ part_form.part }}
+                                                {{ part_form.new_part }}
+                                                {{ part_form.quantity.errors }}
+                                                {{ part_form.quantity }}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </fieldset>
+                                <div class="form-group">
+                                    <div class="control-label col-md-3"></div>
+                                    <div class="col-md-9">
+                                        <button type="button" id="add_more_parts" class="btn btn-xs blue"><i class="fa fa-plus"></i> Add More Parts</button>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="service_request" value="{{ service_request.id }}">
+                                <input type="hidden" id="saveOrComplete" name="save_or_complete" value="save">
+                            </div>
+                            <div class="form-actions">
+                                <div class="row">
+                                    <div class="col-md-offset-3 col-md-9">
+                                        {% if work_order and work_order.completed_at %}
+                                            <button id="save" type="button" class="btn blue"><i class="fa fa-save"></i> Save</button>
+                                            {% if not work_order.finished_at %}
+                                                <button id="finish" type="button" class="btn green"><i class="fa fa-check"></i> Finish</button>
+                                            {% endif %}
+                                        {% elif not work_order.completed_at %}
+                                            <button id="save" type="button" class="btn blue"><i class="fa fa-save"></i> Save</button>
+                                            <button id="complete" type="button" class="btn green"><i class="fa fa-check"></i> Save and Mark Completed</button>
+                                        {% endif %}
+                                        <a href="{% url "home" %}" class="btn default">Cancel</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- END FORM-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript" src="{% static "shop/js/work-order-form.min.js" %}"></script>
+{% endblock %}

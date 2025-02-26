@@ -1,0 +1,417 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+{% load services_extras %}
+{% load common_extras %}
+
+{% block page_title %} | Services{% endblock %}
+
+{% block services_active %}active{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static "global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css" %}">
+<link rel="stylesheet" type="text/css" href="{% static "global/plugins/star-input/css/star-rating.min.css" %}">
+{% endblock %}
+
+{% block content %}
+<div class="col-md-12">
+    <div class="tabbable-custom tabbable-noborder">
+        <ul class="nav nav-tabs">
+            <li class="active">
+                <a href="#newServices" data-toggle="tab" aria-expanded="true">New Services</a>
+            </li>
+            <li class="">
+                <a href="#completedServices" data-toggle="tab" aria-expanded="false">Completed Services</a>
+            </li>
+            <li class="">
+                <a href="#enteredServices" data-toggle="tab" aria-expanded="false">Entered Services</a>
+            </li>
+            <li class="">
+                <a href="#newWorkOrders" data-toggle="tab" aria-expanded="false">Single Work Orders</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <!-- New Services Start -->
+            <div class="tab-pane active" id="newServices">
+                <div class="portlet box red">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <i class="fa fa-edit"></i>New Services
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <h3>In the Yard</h3>
+                        <table class="table table-striped table-bordered table-hover dataTable no-footer" id="inTheYardTable" role="grid">
+                            <thead>
+                                <tr role="row">
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                        Username
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                        Equipment Number
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                        Date Submitted
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                        Work Flow
+                                    </th>
+                                    <th class="sorting_disabled" rowspan="1" colspan="1">
+                                        Edit
+                                    </th>
+                                    <th class="sorting_disabled" rowspan="1" colspan="1">
+                                        Print
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="serviceBody">
+                                {% for service in in_the_yard %}
+                                    <tr class="gradeX {% cycle 'odd' 'even' %}" role="row">
+                                        <td>
+                                            {{ service.created_by.username }}
+                                        </td>
+                                        <td>
+                                            {{ service.equipment }}
+                                        </td>
+                                        <td>
+                                            <span class="hidden">{{ service.created_at|date:"YmdHis" }}</span>{{ service.created_at }}
+                                        </td>
+                                        <td>
+                                            <input type="number" class="stars" value="{{ service.priority }}" data-request-id="{{ service.id }}" {% if user|is_exclusive_member:'shop' or user|is_exclusive_member:'driver' %}disabled="disabled"{% endif %}>
+                                            <span class="hidden">{{ service.priority }}</span>
+                                        </td>
+                                        <td>
+                                            <a href="{% if service.work_order %}{% url 'work_order_edit' service.work_order.id %}{% else %}{% url 'work_order_create' %}?service_request_id={{ service.id }}{% endif %}">Edit</a>
+                                            {% if user.is_admin or user|is_member:'office' %}
+                                                &nbsp;<a href="{% url 'move_to_road' service.id %}"><i class="fa fa-arrow-circle-down"></i></a>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'service_request_print' service.id %}">Print</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <h3>On the Road</h3>
+                        <table class="table table-striped table-bordered table-hover dataTable no-footer" id="onTheRoadTable" role="grid">
+                            <thead>
+                                <tr role="row">
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                        Username
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                        Equipment Number
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                        Date Submitted
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                        Expected Date of Arrival
+                                    </th>
+                                    <th class="sorting_disabled" rowspan="1" colspan="1">
+                                         Edit
+                                    </th>
+                                    <th class="sorting_disabled" rowspan="1" colspan="1">
+                                        Print
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="onTheRoadBody">
+                                {% for service in on_the_road %}
+                                    <tr class="gradeX {% cycle 'odd' 'even' %}" role="row">
+                                        <td>
+                                            {{ service.created_by.username }}
+                                        </td>
+                                        <td>
+                                            {{ service.equipment }}
+                                        </td>
+                                        <td>
+                                            <span class="hidden">{{ service.created_at|date:"YmdHis" }}</span>{{ service.created_at }}
+                                        </td>
+                                        <td>
+                                            {% if user.is_admin or user|is_member:'office' %}
+                                                <input type="date" class="expected-date" value="{{ service.expected_date_of_arrival|date:'Y-m-d' }}" data-id="{{ service.id }}">
+                                            {% else %}
+                                                {{ service.expected_date_of_arrival }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% if service.work_order %}{% url 'work_order_edit' service.work_order.id %}{% else %}{% url 'work_order_create' %}?service_request_id={{ service.id }}{% endif %}">Edit</a>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'service_request_print' service.id %}">Print</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- New Services End -->
+            <!-- Completed Services Start -->
+            <div class="tab-pane" id="completedServices">
+                <div class="portlet box red">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <i class="fa fa-check"></i>Completed Services
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <table class="table table-striped table-bordered table-hover dataTable no-footer" id="completedServicesTable" role="grid">
+                            <thead>
+                                <tr role="row">
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                         Username
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                         Equipment Number
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                         Date Submitted
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                         Date Completed
+                                    </th>
+                                    <th class="sorting_disabled" rowspan="1" colspan="1">
+                                         Edit
+                                    </th>
+                                    <th class="sorting_disabled" rowspan="1" colspan="1">
+                                         Print
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for service in completed_services %}
+                                    <tr class="gradeX {% cycle 'odd' 'even' %}" role="row">
+                                        <td>
+                                            {{ service.created_by.username }}
+                                        </td>
+                                        <td>
+                                            {% if service.work_order %}
+                                                {{ service.equipment }}
+                                            {% else %}
+                                                {{ service.unit_number }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ service.created_at }}
+                                        </td>
+                                        <td>
+                                            {% if service.work_order %}
+                                                {{ service.work_order.completed_at }}
+                                            {% else %}
+                                                {{ service.completed_at }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% if service.work_order %}{% url 'work_order_edit' service.work_order.id %}{% else %}{% url 'work_order_edit' service.id %}{% endif %}">Edit</a>
+                                        </td>
+                                        <td>
+                                            {% if service.work_order %}
+                                                <a href="{% url 'work_order_print' service.work_order.id %}">Print</a>
+                                            {% else %}
+                                                <a href="{% url 'work_order_print' service.id %}">Print</a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Completed Services End -->
+            <!-- Finished Services Start -->
+            <div class="tab-pane" id="enteredServices">
+                <div class="portlet box red">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <i class="fa fa-check"></i>Entered Services
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <div class="table-toolbar">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="text" id="batch-input" class="form-control" placeholder="Unit Number-Axon Work Order Number">
+                                        <span class="input-group-btn">
+                                            <button id="batch-print" class="btn green" type="button">Print</button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-striped table-bordered table-hover dataTable no-footer" id="enteredServicesTable" role="grid">
+                            <thead>
+                                <tr role="row">
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                         Username
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                         Equipment Number
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                         Axon Work Order Number
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                         Date Started
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                         Date Completed
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                         Date Finished
+                                    </th>
+                                    <th class="sorting_disabled" rowspan="1" colspan="1">
+                                         Edit
+                                    </th>
+                                    <th class="sorting_disabled" rowspan="1" colspan="1">
+                                         Print
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for service in entered_services %}
+                                    <tr class="gradeX {% cycle 'odd' 'even' %}" role="row">
+                                        <td>
+                                            {{ service.created_by.username }}
+                                        </td>
+                                        <td>
+                                            {% if service.work_order %}
+                                                {{ service.equipment }}
+                                            {% else %}
+                                                {{ service.unit_number }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if service.work_order %}
+                                                {{ service.work_order.axon_number }}
+                                            {% else %}
+                                                {{ service.axon_number }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if service.work_order %}
+                                                {{ service.work_order.created_at }}
+                                            {% else %}
+                                                {{ service.created_at }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if service.work_order %}
+                                                {{ service.work_order.completed_at }}
+                                            {% else %}
+                                                {{ service.completed_at }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if service.work_order %}
+                                                {{ service.work_order.finished_at }}
+                                            {% else %}
+                                                {{ service.finished_at }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% if service.work_order %}{% url 'work_order_edit' service.work_order.id %}{% else %}{% url 'work_order_edit' service.id %}{% endif %}">Edit</a>
+                                        </td>
+                                        <td>
+                                            {% if service.work_order %}
+                                                <a href="{% url 'work_order_print' service.work_order.id %}">Print</a>
+                                            {% else %}
+                                                <a href="{% url 'work_order_print' service.id %}">Print</a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Finished Services End -->
+            <!-- Single Work Order Start -->
+            <div class="tab-pane" id="newWorkOrders">
+                <div class="portlet box red">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <i class="fa fa-edit"></i>Single Work Orders
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <div class="table-toolbar">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="btn-group">
+                                        <a href="{% url 'work_order_create' %}" class="btn green">
+                                        Add New Work Order <i class="fa fa-plus"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-striped table-bordered table-hover dataTable no-footer" id="newWorkOrdersTable" role="grid">
+                            <thead>
+                                <tr role="row">
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                        Username
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                        Unit Number
+                                    </th>
+                                    <th class="sorting" rowspan="1" colspan="1">
+                                        Date Submitted
+                                    </th>
+                                    <th class="sorting_disabled" rowspan="1" colspan="1">
+                                        Edit
+                                    </th>
+                                    <th class="sorting_disabled" rowspan="1" colspan="1">
+                                        Print
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="workOrderBody">
+                                {% for work_order in work_orders %}
+                                    <tr class="gradeX {% cycle 'odd' 'even' %}" role="row">
+                                        <td>
+                                            {{ work_order.created_by.username }}
+                                        </td>
+                                        <td>
+                                            {{ work_order.unit_number }}
+                                        </td>
+                                        <td>
+                                            {{ work_order.created_at }}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'work_order_edit' work_order.id %}">Edit</a>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'work_order_print' work_order.id %}">Print</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Single Work Order End -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript" src="{% static "global/plugins/select2/select2.min.js" %}"></script>
+<script type="text/javascript" src="{% static "global/plugins/datatables/media/js/jquery.dataTables.min.js" %}"></script>
+<script type="text/javascript" src="{% static "global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js" %}"></script>
+<script type="text/javascript" src="{% static "global/plugins/star-input/js/star-rating.min.js" %}" type="text/javascript"></script>
+<script type="text/javascript" src="{% static "shop/js/services.min.js" %}"></script>
+<script>
+jQuery(document).ready(function() {
+   TableManaged.init();
+});
+</script>
+{% endblock %}
